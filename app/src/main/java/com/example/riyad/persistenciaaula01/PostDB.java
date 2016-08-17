@@ -2,6 +2,7 @@ package com.example.riyad.persistenciaaula01;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -44,7 +45,7 @@ public class PostDB extends SQLiteOpenHelper {
                 String _id = String.valueOf(post.getId());
                 String[] whereArgs = new String[]{_id};
                 int count = db.update("post", values," _id=?", whereArgs);
-                Log.i(TAG, "Atualizou post");
+                Log.d(TAG, "Atualizou post");
                 return count;
             } else {
                 id = db.insert("post", "", values);
@@ -59,5 +60,27 @@ public class PostDB extends SQLiteOpenHelper {
         }
     }
 
+    public Post findById(Long id){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = null;
+        try{
+            c = db.query("post", null, "_id = ?", new String[]{String.valueOf(id)}, null, null, null);
+            c.moveToFirst();
+            Post post = new Post();
+            post.setId(c.getLong(c.getColumnIndex("_id")));
+            post.setTexto(c.getString(c.getColumnIndex("texto")));
+            post.setLikes(c.getLong(c.getColumnIndex("data")));
+            Log.d("TAG", "Consultou post.");
+            return post;
+        } catch (Exception e){
+            Log.d(TAG, "Erro: " + e.getMessage());
+            return null;
+        } finally {
+            if (c != null){
+                c.close();
+            }
+            db.close();
+        }
+    }
 
 }
